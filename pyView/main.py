@@ -13,22 +13,29 @@ from PyQt5.QtGui     import QPalette, QColor, QPainter, QPixmap, QImage, QPen
 
 from videoFeed import VidFeed
 
+
 class VideoFeedThread(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
-    
 
     def run(self):
         # capture from web cam
         self.cap = VidFeed(None)
         self.cap.startPrev()
 
+        self.__run = True
         while True:
-            if self.cap.is_frame_ready():
+            if self.cap.is_frame_ready() and self.__run:
                 cv_img = self.cap.get_frame()
                 self.change_pixmap_signal.emit(cv_img)
 
     def call_zoom(self,x,y,width,height):
         self.cap.zoom(x,y,width,height)
+
+    def task_stop(self):
+        self.__run = False
+
+    def task_start(self):
+        self.__run = True
 
 class VideoDisplay(QLabel):
 
@@ -64,7 +71,7 @@ class VideoDisplay(QLabel):
         self.thread.start()
 
         self.setMouseTracking(True)
-        
+
     @pyqtSlot(np.ndarray)
     def update_image(self, cv_img):
         qt_img = self.convert_frame_qt(cv_img)
@@ -76,6 +83,12 @@ class VideoDisplay(QLabel):
         Qt_format = QImage(frame, frame.shape[1], frame.shape[0], QtGui.QImage.Format_RGB888)  
         # p = convert_to_Qt_format.scaled(self.disply_width, self.display_height, Qt.KeepAspectRatio)
         return QPixmap.fromImage(Qt_format)
+
+    def stop(self):
+        self.thread.task_stop()
+
+    def start(self):
+        self.thread.task_start()
 
     def setZoom(self):
         if(self.pos1_x < self.pos2_x):
@@ -152,27 +165,37 @@ class MainWindow(QWidget):
     def __init__(self,display):
         super().__init__()
 
-        
         self.setWindowTitle('PyView')
-        
         self.setGeometry(QRect(530, 20, 256, 192))
-        
-        reset_view = QPushButton('Reset View')
-        reset_view.clicked.connect(display.resetZoom)
 
-        froze_view = QPushButton('Froze')
-        froze_view.clicked.connect(display.stop)
+        self.display = display
+        
+        self.reset_zoom = QPushButton('Reset Zoom')
+        self.reset_zoom.clicked.connect(self.display.resetZoom)
+
+        self.is_view_frozen = False
+        self.froze_view = QPushButton('Freeze View')
+        self.froze_view.clicked.connect(self.__froze_view_clicked)
 
         layout = QGridLayout()
         layout.addWidget(display, 0, 1,3, 3)
-        layout.addWidget(froze_view, 0, 0)
-        layout.addWidget(reset_view, 1, 0)
+        layout.addWidget(self.froze_view, 0, 0)
+        layout.addWidget(self.reset_zoom, 1, 0)
 
         # self.setStyleSheet("background-color:black;")
         # self.setAutoFillBackground(True)
         
         self.setLayout(layout)
 
+    def __froze_view_clicked(self):
+        if self.is_view_frozen:
+            self.froze_view.setText("Freeze View")
+            self.display.start()
+            self.is_view_frozen = False
+        else:
+            self.froze_view.setText("Unfreeze View")
+            self.display.stop()
+            self.is_view_frozen = True
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
