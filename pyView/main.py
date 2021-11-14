@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 from PyQt5 import QtGui 
+from datetime import datetime
 
 from PyQt5.QtWidgets import QApplication, QLabel, QLayout
 from PyQt5.QtWidgets import QGridLayout
@@ -113,6 +114,16 @@ class VideoDisplay(QLabel):
         painter.drawLine(curr_x, curr_y, x_anchron, curr_y)
         painter.drawLine(curr_x, curr_y, curr_x, y_anchron)
 
+    def saveView(self):
+        if self.MicroScope.isZoomSet():
+            view = self.MicroScope.cropImage(self.curr_frame,self.rect())
+        else:
+            view = self.curr_frame
+
+        now = datetime.now() 
+        time = now.strftime("%H:%M:%S")
+        return view.save(f"saved_frames/frame_{time}.png")
+
     def mousePressEvent(self, event):
         self.Anchron = Point(event.x(),event.y())
 
@@ -154,10 +165,14 @@ class MainWindow(QWidget):
         self.froze_view = QPushButton('Freeze View')
         self.froze_view.clicked.connect(self.__froze_view_clicked)
 
+        self.save_view = QPushButton('Save View') 
+        self.save_view.clicked.connect(self.display.saveView)
+
         layout = QGridLayout()
-        layout.addWidget(display, 0, 1,3, 3)
+        layout.addWidget(display, 0, 1,6, 6)
         layout.addWidget(self.froze_view, 0, 0)
-        layout.addWidget(self.reset_zoom, 1, 0)
+        layout.addWidget(self.save_view , 1, 0)
+        layout.addWidget(self.reset_zoom, 2, 0)
 
         # self.setStyleSheet("background-color:black;")
         # self.setAutoFillBackground(True)
