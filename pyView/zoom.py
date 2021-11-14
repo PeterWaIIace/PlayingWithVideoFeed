@@ -84,7 +84,6 @@ class ZoomScope:
         #check if images and display have the same dimensions
         sf_w,sf_h = self.__get_dim_scale_factor(display,img)
 
-        print(sf_w,sf_h)
         crop_rect = QRect(
             self.__x / sf_w,
             self.__y / sf_h,
