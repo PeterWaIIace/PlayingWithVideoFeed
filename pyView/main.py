@@ -166,7 +166,7 @@ class MainWindow(QWidget):
         self.froze_view.clicked.connect(self.__froze_view_clicked)
 
         self.save_view = QPushButton('Save View') 
-        self.save_view.clicked.connect(self.display.saveView)
+        self.save_view.clicked.connect(self.__save_view)
 
         layout = QGridLayout()
         layout.addWidget(display, 0, 1,6, 6)
@@ -189,9 +189,14 @@ class MainWindow(QWidget):
             self.display.stop()
             self.is_view_frozen = True
 
+    def __save_view(self):
+        if self.display.saveView():
+            pass
+        else:
+            print("Failed to save frame")
+
 if __name__=="__main__":
     app = QApplication(sys.argv)
-
     # interface = videoInterface()
     display = VideoDisplay()
 
