@@ -5,15 +5,14 @@ from datetime import datetime
 
 from PyQt5.QtWidgets import QApplication, QLabel, QLayout
 from PyQt5.QtWidgets import QGridLayout
-from PyQt5.QtWidgets import QStackedLayout
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtWidgets import QStackedWidget
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtCore    import QRect, Qt, QThread, pyqtSignal, pyqtSlot
-from PyQt5.QtGui     import QPalette, QColor, QPainter, QPixmap, QImage, QPen
+from PyQt5.QtGui     import QColor, QPainter, QPixmap, QImage, QPen
 
 from zoom import ZoomScope, ROI, Point
 from videoFeed import VidFeed
+from frameList import SavedFrames
 
 class VideoFeedThread(QThread):
     change_pixmap_signal = pyqtSignal(np.ndarray)
@@ -53,9 +52,10 @@ class VideoDisplay(QLabel):
 
         self.draw_zoom = False
         self.curr_frame = None
+        self.cp_curr_frame = None
 
         self.MicroScope = ZoomScope(self.rect().width(),self.rect().height())
-        self.Region = ROI()
+        self.Region     = ROI()
 
         self.pxman = QPixmap(640, 480)
         self.pxman.fill(QColor('darkGray'))
@@ -72,6 +72,7 @@ class VideoDisplay(QLabel):
     def updateImage(self, np_img):
         qt_img = self.convertFrame(np_img)
         self.curr_frame = qt_img.scaled(640,480, Qt.KeepAspectRatio)
+        self.cp_curr_frame = self.curr_frame
         self.update()
 
     def convertFrame(self, frame):
@@ -84,6 +85,7 @@ class VideoDisplay(QLabel):
         self.thread.task_stop()
 
     def start(self):
+        self.curr_frame = self.cp_curr_frame
         self.thread.task_start()
 
     def resetZoom(self):
@@ -124,6 +126,13 @@ class VideoDisplay(QLabel):
         time = now.strftime("%H:%M:%S")
         return view.save(f"saved_frames/frame_{time}.png")
 
+    def changeView(self,view):
+        self.stop()
+        self.parent().freezeView()
+        self.cp_curr_frame = self.curr_frame
+        self.curr_frame    = view
+        self.update()
+
     def mousePressEvent(self, event):
         self.Anchron = Point(event.x(),event.y())
 
@@ -137,11 +146,9 @@ class VideoDisplay(QLabel):
                 self.rect()
                 )
         else:
-
             self.Region.addPoint(self.Anchron)
             self.Cursor = Point(event.x(),event.y())
             self.draw_zoom = True
-        
         self.update()
 
     def mouseMoveEvent(self,event):
@@ -157,7 +164,8 @@ class MainWindow(QWidget):
         self.setGeometry(QRect(530, 20, 256, 192))
 
         self.display = display
-        
+        self.listOfFrames = SavedFrames(self.display)
+
         self.reset_zoom = QPushButton('Reset Zoom')
         self.reset_zoom.clicked.connect(self.display.resetZoom)
 
@@ -173,11 +181,17 @@ class MainWindow(QWidget):
         layout.addWidget(self.froze_view, 0, 0)
         layout.addWidget(self.save_view , 1, 0)
         layout.addWidget(self.reset_zoom, 2, 0)
+        layout.addLayout(self.listOfFrames,7,0,1,7)
 
-        # self.setStyleSheet("background-color:black;")
-        # self.setAutoFillBackground(True)
-        
         self.setLayout(layout)
+
+    def freezeView(self):
+        self.froze_view.setText("Unfreeze View")
+        self.is_view_frozen = True
+
+    def unFreezeView(self):
+        self.froze_view.setText("Unfreeze View")
+        self.is_view_frozen = False
 
     def __froze_view_clicked(self):
         if self.is_view_frozen:
@@ -191,20 +205,18 @@ class MainWindow(QWidget):
 
     def __save_view(self):
         if self.display.saveView():
-            pass
+            self.listOfFrames.update_thumbnails()
         else:
             print("Failed to save frame")
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
-    # interface = videoInterface()
+
     display = VideoDisplay()
 
     window = MainWindow(display)
     window.show()
 
-    # vid = VidFeed(display.get_id())
-    # vid.startPrev()
 
     sys.exit(app.exec_())
 
