@@ -6,9 +6,11 @@ from os.path import isfile, join
 from PyQt5.QtCore    import Qt,QSize,QRect
 from PyQt5.QtWidgets import QVBoxLayout,QHBoxLayout,QScrollArea,QWidget,QLabel, QApplication
 from PyQt5.QtGui     import QPixmap
-from PyQt5.QtWidgets import QPushButton, QFrame
+from PyQt5.QtWidgets import QFrame
 
 class savedFrame(QFrame):
+
+    FRAME_WIDTH = 140
 
     def __init__(self,path,title,display):
         super().__init__()
@@ -19,10 +21,15 @@ class savedFrame(QFrame):
     def __init__UI(self,path,title):
         
         name = QLabel()
+        name.setText(title)
+        name.setFixedWidth(self.FRAME_WIDTH)
+        name.setAlignment(Qt.AlignCenter)
+
         flayout = QVBoxLayout()
         picture = Picture(join(path,title),self.display)
+        picture.setFixedWidth(self.FRAME_WIDTH)
+        picture.setAlignment(Qt.AlignCenter)
 
-        name.setText(title)
         flayout.addWidget(name)
         flayout.addWidget(picture)
         self.setLayout(flayout)
@@ -48,10 +55,6 @@ class Picture(QLabel):
         self.pixmap     = self.pixmap.scaledToWidth(128)
         self.pixmap     = self.pixmap.scaledToHeight(64)
 
-        self.setFixedHeight(self.pixmap.height())
-        self.setFixedWidth(self.pixmap.width())
-
-        self.setContentsMargins(10,0,0,0)
         self.setPixmap(self.pixmap)
 
         self.setMouseTracking(True)
