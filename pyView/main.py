@@ -59,9 +59,10 @@ class VideoDisplay(QLabel):
 
         self.pxman = QPixmap(640, 480)
         self.pxman.fill(QColor('darkGray'))
+
         # set the image image to the grey pixmap
         self.setPixmap(self.pxman)
-        
+
         self.thread = VideoFeedThread()
         self.thread.change_pixmap_signal.connect(self.updateImage)
         self.thread.start()
@@ -128,6 +129,7 @@ class VideoDisplay(QLabel):
 
     def changeView(self,view):
         self.stop()
+        self.resetZoom()
         self.parent().freezeView()
         self.cp_curr_frame = self.curr_frame
         self.curr_frame    = view
@@ -205,7 +207,7 @@ class MainWindow(QWidget):
 
     def __save_view(self):
         if self.display.saveView():
-            self.listOfFrames.update_thumbnails()
+            self.listOfFrames.update_images()
         else:
             print("Failed to save frame")
 
@@ -216,7 +218,6 @@ if __name__=="__main__":
 
     window = MainWindow(display)
     window.show()
-
 
     sys.exit(app.exec_())
 
