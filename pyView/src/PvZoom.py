@@ -110,7 +110,10 @@ class ZoomScope:
         return self.__zoom_applied
 
     def set(self, region, display):
-
+        '''
+        Sets zoom based on the region (but zoom is not applied to frame yet). 
+        It also need to take display (Qt object) for reference.
+        '''
         x1 = region.getP1().x()
         y1 = region.getP1().y()
         x2 = region.getP2().x()
@@ -124,6 +127,9 @@ class ZoomScope:
             self.reset(display.width(), display.height())
 
     def reset(self, width, height):
+        '''
+        Resets zoom to default position. It takes width and height of display. 
+        '''
         self.__x = 0
         self.__y = 0
         self.__w = width
@@ -131,6 +137,13 @@ class ZoomScope:
         self.crop_image = False
 
     def apply(self, img, display):
+        '''
+
+        Applies set zoom to the frame.
+        It also need to take display (Qt object) for reference.
+
+        '''
+
         # check if images and display have the same dimensions
         sf_w, sf_h = self.__get_dim_scale_factor(display, img)
 

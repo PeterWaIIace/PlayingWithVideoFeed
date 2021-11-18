@@ -16,6 +16,12 @@ from src.PvFrames import SavedFrames
 
 
 class VideoFeedThread(QThread):
+    '''
+    
+    Thread for reading frames from gstreamer appsink.
+
+    '''
+
     change_pixmap_signal = pyqtSignal(np.ndarray)
 
     def run(self):
@@ -25,21 +31,24 @@ class VideoFeedThread(QThread):
 
         self.__run = True
         while True:
-            if self.cap.is_frame_ready() and self.__run:
-                np_img = self.cap.get_frame()
+            if self.cap.isFrameReady() and self.__run:
+                np_img = self.cap.getFrame()
                 self.change_pixmap_signal.emit(np_img)
 
-    def call_zoom(self, x, y, width, height):
-        self.cap.zoom(x, y, width, height)
-
-    def task_stop(self):
+    def taskStop(self):
         self.__run = False
 
-    def task_start(self):
+    def taskStart(self):
         self.__run = True
 
 
 class VideoDisplay(QLabel):
+
+    '''
+
+    Main GUI display element.
+
+    '''
 
     def __init__(self):
         super().__init__()
@@ -55,6 +64,9 @@ class VideoDisplay(QLabel):
         self.buffor_frame = None
         self.cp_buffor_frame = None
 
+        self.__init__UI()
+
+    def __init__UI(self):
         self.Region = ROI()
         self.Zoom = ZoomScope()
 
@@ -89,18 +101,83 @@ class VideoDisplay(QLabel):
         return QPixmap.fromImage(Qt_format)
 
     def stop(self):
-        self.thread.task_stop()
+        """
+
+        Stop videofeed thread.
+
+        """
+
+        self.thread.taskStop()
 
     def start(self):
+        """
+
+        Resume videofeed thread. 
+
+        """
+
         self.buffor_frame = self.cp_buffor_frame
-        self.thread.task_start()
+        self.thread.taskStart()
 
     def reset(self):
+        """
+
+        Reset set and applied zoom. 
+
+        """
+
         self.Zoom.reset(
             self.rect().width(),
             self.rect().height()
         )
         self.update()
+
+    def saveView(self):
+        """
+
+        Save current frame. 
+
+        """
+
+        if self.Zoom.isSet():
+            view = self.Zoom.apply(self.buffor_frame, self.rect())
+        else:
+            view = self.buffor_frame
+
+        now = datetime.now()
+        time = now.strftime("%H:%M:%S")
+        return view.save(f"saved_frames/frame_{time}.png")
+
+    def changeView(self, view):
+        """
+
+        Change currently browsed frame. 
+
+        """
+
+        self.stop()
+        self.reset()
+        self.parent().btnChngStateFreezeView()
+        self.cp_buffor_frame = self.buffor_frame
+        self.buffor_frame = view
+        self.update()
+
+    def draw(self, painter, x_anchron, y_anchron, curr_x, curr_y):
+        """
+        
+        Draw rectangle based on 2 points.
+
+        """
+
+        pen = QPen(Qt.red, 3)
+        painter.setPen(pen)
+        painter.drawLine(x_anchron, y_anchron, x_anchron, curr_y)
+        painter.drawLine(x_anchron, y_anchron, curr_x, y_anchron)
+        painter.drawLine(curr_x, curr_y, x_anchron, curr_y)
+        painter.drawLine(curr_x, curr_y, curr_x, y_anchron)
+
+
+    # Below you can find PyQT events handlers 
 
     def paintEvent(self, event):
         if not (self.buffor_frame is None):
@@ -119,32 +196,6 @@ class VideoDisplay(QLabel):
                     self.Anchron.y(),
                     self.Cursor.x(),
                     self.Cursor.y())
-
-    def draw(self, painter, x_anchron, y_anchron, curr_x, curr_y):
-        pen = QPen(Qt.red, 3)
-        painter.setPen(pen)
-        painter.drawLine(x_anchron, y_anchron, x_anchron, curr_y)
-        painter.drawLine(x_anchron, y_anchron, curr_x, y_anchron)
-        painter.drawLine(curr_x, curr_y, x_anchron, curr_y)
-        painter.drawLine(curr_x, curr_y, curr_x, y_anchron)
-
-    def saveView(self):
-        if self.Zoom.isSet():
-            view = self.Zoom.apply(self.buffor_frame, self.rect())
-        else:
-            view = self.buffor_frame
-
-        now = datetime.now()
-        time = now.strftime("%H:%M:%S")
-        return view.save(f"saved_frames/frame_{time}.png")
-
-    def changeView(self, view):
-        self.stop()
-        self.reset()
-        self.parent().btnChngStateFreezeView()
-        self.cp_buffor_frame = self.buffor_frame
-        self.buffor_frame = view
-        self.update()
 
     def mousePressEvent(self, event):
         self.Anchron = Point(event.x(), event.y())
@@ -172,8 +223,17 @@ class VideoDisplay(QLabel):
 
 class PyViewMainWindow(QWidget):
 
+    '''
+
+    PyView Main window. It should be invoked in main to start entire application
+
+    '''
+
     def __init__(self):
         super().__init__()
+        self.__init__UI()
+    
+    def __init__UI(self):
 
         self.setWindowTitle('PyView')
         self.setGeometry(QRect(530, 20, 256, 192))

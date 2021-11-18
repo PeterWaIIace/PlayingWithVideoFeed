@@ -136,7 +136,7 @@ class VidFeed:
                 win_id = self.movie_window.get_property('window').get_xid()
             imagesink.set_window_handle(win_id)
 
-    def is_frame_ready(self):
+    def isFrameReady(self):
         '''
         Allows to check if new frame is ready to be obtained from stream.
 
@@ -147,7 +147,7 @@ class VidFeed:
 
         return not (self.frame_buffor is None)
 
-    def get_frame(self):
+    def getFrame(self):
         '''
         Returns latest frame from frame buffor
         Frame is stored as numpy array.

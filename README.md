@@ -88,13 +88,13 @@ After that main window should be visible.
 Window provide simply option to display camera view, and zoom into interesting elements
 
 Inline-style: 
-![alt text](https://github.com/PeterWaIIace/PlayingWithVideoFeed/Images/main_display.png "main_display")
+![alt text](https://github.com/PeterWaIIace/PlayingWithVideoFeed/tree/main/Images/main_display.png "main_display")
 ##### 2. Zoom
 
 To zoom press on main videofeed area, after pressing button you can mark the interesting region ot zoom in.
 
 Inline-style: 
-![alt text](https://github.com/PeterWaIIace/PlayingWithVideoFeed/Images/zoom.png "zoom")
+![alt text](https://github.com/PeterWaIIace/PlayingWithVideoFeed/tree/main/Images/zoom.png "zoom")
 
 Zoom can be done on livefeed or static images like previous frames.
 ##### 3. Freeze, Save, Reset
@@ -106,14 +106,14 @@ Save - saves the current frame into static directory "saved_frames/"
 Reset - resets zoom/zoom out.
 
 Inline-style: 
-![alt text](https://github.com/PeterWaIIace/PlayingWithVideoFeed/Images/buttons.png "buttons")
+![alt text](https://github.com/PeterWaIIace/PlayingWithVideoFeed/tree/main/Images/buttons.png "buttons")
 
 ##### 4. Previous frames
 
 You can investigate previous frames, by pressing one of the images representing saved frames. It allows for example to zoom in and investigate static frames.
 
 Inline-style: 
-![alt text](https://github.com/PeterWaIIace/PlayingWithVideoFeed/Images/previous_frames.png "previous_frames")
+![alt text](https://github.com/PeterWaIIace/PlayingWithVideoFeed/tree/main/Images/previous_frames.png "previous_frames")
 
 ##### 5. Gstreamer configuration
 
