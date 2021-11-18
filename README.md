@@ -81,7 +81,7 @@ python3 main.py
 
 After that main window should be visible. 
 
-#### Features
+### Features
 
 ##### 1. Main VideoFeed
 
