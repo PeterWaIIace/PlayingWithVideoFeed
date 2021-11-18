@@ -182,10 +182,8 @@ if __name__ == "__main__":
     cameraWindow.setAttribute(0, 1)  # AA_ImmediateWidgetCreation == 0
     cameraWindow.setAttribute(3, 1)  # AA_NativeWindow == 3
     cameraWindow.show()
-
-    wId = cameraWindow.winId()
-
-    vid = VidFeed(wId)
+    
+    vid = VidFeed()
     vid.startPrev()
     time.sleep(2)
     sys.exit(app.exec_())

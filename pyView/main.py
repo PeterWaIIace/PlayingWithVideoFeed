@@ -10,7 +10,8 @@ if __name__ == "__main__":
 
     window = PyViewMainWindow()
     window.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint |
-                          Qt.WindowCloseButtonHint | Qt.WindowStaysOnTopHint)
+                          Qt.WindowCloseButtonHint | Qt.WindowStaysOnTopHint |
+                          Qt.WindowMaximizeButtonHint | Qt.WindowMinimizeButtonHint )
     window.show()
 
     sys.exit(app.exec_())
