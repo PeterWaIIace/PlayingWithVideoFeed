@@ -111,7 +111,7 @@ class ZoomScope:
 
     def set(self, region, display):
         '''
-        Sets zoom based on the region (but zoom is not applied to frame yet). 
+        Sets zoom based on the region (but zoom is not applied to frame yet).
         It also need to take display (Qt object) for reference.
         '''
         x1 = region.getP1().x()
@@ -128,7 +128,7 @@ class ZoomScope:
 
     def reset(self, width, height):
         '''
-        Resets zoom to default position. It takes width and height of display. 
+        Resets zoom to default position. It takes width and height of display.
         '''
         self.__x = 0
         self.__y = 0

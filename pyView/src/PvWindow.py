@@ -17,7 +17,7 @@ from src.PvFrames import SavedFrames
 
 class VideoFeedThread(QThread):
     '''
-    
+
     Thread for reading frames from gstreamer appsink.
 
     '''
@@ -112,7 +112,7 @@ class VideoDisplay(QLabel):
     def start(self):
         """
 
-        Resume videofeed thread. 
+        Resume videofeed thread.
 
         """
 
@@ -122,7 +122,7 @@ class VideoDisplay(QLabel):
     def reset(self):
         """
 
-        Reset set and applied zoom. 
+        Reset set and applied zoom.
 
         """
 
@@ -135,7 +135,7 @@ class VideoDisplay(QLabel):
     def saveView(self):
         """
 
-        Save current frame. 
+        Save current frame.
 
         """
 
@@ -151,7 +151,7 @@ class VideoDisplay(QLabel):
     def changeView(self, view):
         """
 
-        Change currently browsed frame. 
+        Change currently browsed frame.
 
         """
 
@@ -164,7 +164,7 @@ class VideoDisplay(QLabel):
 
     def draw(self, painter, x_anchron, y_anchron, curr_x, curr_y):
         """
-        
+
         Draw rectangle based on 2 points.
 
         """
@@ -176,8 +176,7 @@ class VideoDisplay(QLabel):
         painter.drawLine(curr_x, curr_y, x_anchron, curr_y)
         painter.drawLine(curr_x, curr_y, curr_x, y_anchron)
 
-
-    # Below you can find PyQT events handlers 
+    # Below you can find PyQT events handlers
 
     def paintEvent(self, event):
         if not (self.buffor_frame is None):
@@ -232,7 +231,7 @@ class PyViewMainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.__init__UI()
-    
+
     def __init__UI(self):
 
         self.setWindowTitle('PyView')

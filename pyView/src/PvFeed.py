@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+from PyQt5.QtCore import QRect
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QApplication
+from gi.repository import Gst, GObject, Gtk
+from gi.repository import GdkX11, GstVideo
 import numpy as np
 import yaml
 import time
@@ -7,12 +13,6 @@ import sys
 import gi
 gi.require_version('Gst', '1.0')
 
-from gi.repository import GdkX11, GstVideo
-from gi.repository import Gst, GObject, Gtk
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import QRect
 
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 
@@ -27,7 +27,8 @@ class VidFeed:
         config = self.__load_config()
 
         self.player = Gst.Pipeline.new("player")
-        self.source = Gst.ElementFactory.make(config["gstreamer_source"], "vsource")
+        self.source = Gst.ElementFactory.make(
+            config["gstreamer_source"], "vsource")
         self.conv = Gst.ElementFactory.make("videoconvert", "colorspace")
         self.scaler = Gst.ElementFactory.make("videoscale", "fvidscale")
         self.crop = Gst.ElementFactory.make('videocrop', 'VideoCrop')
@@ -55,7 +56,7 @@ class VidFeed:
 
     def __load_config(self):
         config_dict = dict()
-        with open(self.CONFIG_FILE,"r") as config_file:
+        with open(self.CONFIG_FILE, "r") as config_file:
             try:
                 config_dict = yaml.safe_load(config_file)
             except yaml.YAMLError as err:
@@ -139,10 +140,6 @@ class VidFeed:
     def isFrameReady(self):
         '''
         Allows to check if new frame is ready to be obtained from stream.
-
-        Out:
-        True - if frame is ready
-        Flase - if frame buffor is empty
         '''
 
         return not (self.frame_buffor is None)
@@ -162,11 +159,7 @@ class VidFeed:
 
     def startPrev(self):
         '''
-        Returns latest frame from frame buffor
-        Frame is stored as numpy array.
-
-        Out:
-        frame - numpy ndarray
+        Starts the feed from gstream pipe.
         '''
 
         self.player.set_state(Gst.State.PLAYING)
@@ -182,7 +175,7 @@ if __name__ == "__main__":
     cameraWindow.setAttribute(0, 1)  # AA_ImmediateWidgetCreation == 0
     cameraWindow.setAttribute(3, 1)  # AA_NativeWindow == 3
     cameraWindow.show()
-    
+
     vid = VidFeed()
     vid.startPrev()
     time.sleep(2)
