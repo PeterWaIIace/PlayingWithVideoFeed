@@ -36,7 +36,7 @@ sudo yum install python3-pyqt5
 Check if gstreamer exists:
 
 ```
-man gst-inspect-1.0
+gst-launch-1.0 --gst-version
 ```
 if not please follow:
 https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c 
