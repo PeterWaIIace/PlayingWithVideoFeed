@@ -17,3 +17,4 @@ ruamel.yaml.clib==0.2.6
 toml==0.10.2
 vext==0.7.6
 vext.gi==0.7.4
+PyYAML-6.0

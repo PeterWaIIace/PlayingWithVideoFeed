@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+import yaml
 import time
 import sys
 
@@ -18,31 +19,26 @@ from PyQt5.QtCore import QRect
 
 class VidFeed:
 
+    CONFIG_FILE = "src/config_gstream.yaml"
+
     def __init__(self):
         Gst.init(None)
-        # gst-launch-1.0 v4l2src do-timestamp=TRUE device=/dev/video0 !
-        # videoconvert ! xvimagesink
+
+        config = self.__load_config()
+
         self.player = Gst.Pipeline.new("player")
-        self.source = Gst.ElementFactory.make("v4l2src", "vsource")
+        self.source = Gst.ElementFactory.make(config["gstreamer_source"], "vsource")
         self.conv = Gst.ElementFactory.make("videoconvert", "colorspace")
         self.scaler = Gst.ElementFactory.make("videoscale", "fvidscale")
         self.crop = Gst.ElementFactory.make('videocrop', 'VideoCrop')
         self.appsink = Gst.ElementFactory.make("appsink", "video-output")
 
+        self.source.set_property("device", config["input_device"])
         self.appsink.set_property("emit-signals", True)
 
-        caps = Gst.caps_from_string(
-            "video/x-raw, format=(string){RGB, GRAY8}; video/x-bayer,format=(string){rggb,bggr,grbg,gbrg}")
+        caps = Gst.caps_from_string(config["app_sink_caps"])
         self.appsink.set_property("caps", caps)
-
         self.appsink.connect("new-sample", self.__new_frame, self.appsink)
-
-        self.crop.set_property('top', 0)
-        self.crop.set_property('bottom', 0)
-        self.crop.set_property('left', 0)
-        self.crop.set_property('right', 0)
-
-        self.source.set_property("device", "/dev/video0")
 
         self.__add_many(
             [self.source, self.conv, self.scaler, self.crop, self.appsink])
@@ -56,6 +52,16 @@ class VidFeed:
         bus.connect("sync-message::element", self.__on_sync_message)
 
         self.frame_buffor = None
+
+    def __load_config(self):
+        config_dict = dict()
+        with open(self.CONFIG_FILE,"r") as config_file:
+            try:
+                config_dict = yaml.safe_load(config_file)
+            except yaml.YAMLError as err:
+                print(err)
+
+        return config_dict
 
     def __gst_to_np(self, sample):
         '''
