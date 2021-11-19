@@ -1,6 +1,6 @@
 # PyView
 
-PyView is simple app allowing to read video device, save frames, investigate previous frames. It is written in python and QT5. 
+PyView is simple app written in python and QT5 allowing to read video device, save frames, investigate previous frames. 
 
 ## HOW TO INSTALL
 
